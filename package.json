@@ -10,6 +10,7 @@
     "electron:serve": "vue-cli-service electron:serve"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "^3.2.15",
     "core-js": "^3.8.3",
     "electron": "^13.0.0",
