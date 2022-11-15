@@ -5,9 +5,8 @@
                 <a href="#">{{ displayName }}</a>
             </template>
             <template #avatar>
-                <a-avatar src="https://joeschmoe.io/api/v1/random"></a-avatar>
+                <a-avatar :src="avatarUrl"></a-avatar>
             </template>
-
         </a-list-item-meta>
         <template #actions v-if="infoType==InfoTypeFriend">
             <a key="sendMsg"><MessageOutlined/></a>
