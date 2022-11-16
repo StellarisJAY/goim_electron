@@ -9,6 +9,7 @@
 <script>
 import {List} from 'ant-design-vue'
 import InfoItem from '../info/InfoItem.vue'
+import {get} from '../../api/request.js'
 export default {
     name: 'FriendList',
     components: {
@@ -20,37 +21,26 @@ export default {
     },
     data() {
         return {
-            friends: [
-                {userID: 1001, account: "xxjay", nickName: "jay", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1002, account: "xxhjxxj", nickName: "xxj", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1003, account: "cad", nickName: "cadwell", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1001, account: "xxjay", nickName: "jay", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1002, account: "xxhjxxj", nickName: "xxj", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1003, account: "cad", nickName: "cadwell", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1001, account: "xxjay", nickName: "jay", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1002, account: "xxhjxxj", nickName: "xxj", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1003, account: "cad", nickName: "cadwell", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1001, account: "xxjay", nickName: "jay", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1002, account: "xxhjxxj", nickName: "xxj", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1003, account: "cad", nickName: "cadwell", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1001, account: "xxjay", nickName: "jay", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1002, account: "xxhjxxj", nickName: "xxj", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1003, account: "cad", nickName: "cadwell", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1001, account: "xxjay", nickName: "jay", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1002, account: "xxhjxxj", nickName: "xxj", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1003, account: "cad", nickName: "cadwell", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1001, account: "xxjay", nickName: "jay", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1002, account: "xxhjxxj", nickName: "xxj", avatar: "https://joeschmoe.io/api/v1/random"},
-                {userID: 1003, account: "cad", nickName: "cadwell", avatar: "https://joeschmoe.io/api/v1/random"},
-                
-            ]
+            friends: []
         }
     },
     methods: {
-
+        getFriends: function() {
+            get('/friend/list')
+            .then(response=>{
+                let resp = response.data
+                if (resp.code == 200) {
+                    this.friends = resp.friends
+                }
+            })
+            .catch(error=>{
+                console.error(error)
+            })
+        }
     },
     mounted() {
-        console.log("friend list mounted")
+        this.getFriends()
+        
     }
 }
 </script>
