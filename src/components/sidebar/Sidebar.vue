@@ -69,6 +69,7 @@ export default {
 <style scoped>
 #sidebar {
 border-right: 1px solid rgb(218, 216, 216);
+background-color: white;
 }
 </style>
   
