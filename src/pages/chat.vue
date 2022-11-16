@@ -4,6 +4,9 @@
         <a-col :span="6">
           <SideBar/>
         </a-col>
+        <a-col :span="18">
+          <ChatCard :is-group="false" :target="0"/>
+        </a-col>
       </a-row>
     </div>
   </template>
@@ -11,12 +14,14 @@
   <script>
   import {Row, Col} from 'ant-design-vue'
   import SideBar from '../components/sidebar/Sidebar.vue'
+  import ChatCard from '../components/chat/Chat.vue'
   export default {
     name: 'ChatPage',
     components: {
       SideBar,
       ARow: Row,
-      ACol: Col
+      ACol: Col,
+      ChatCard
     },
     props: {
       msg: String
