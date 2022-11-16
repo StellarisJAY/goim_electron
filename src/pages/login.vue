@@ -9,14 +9,14 @@
                     layout="vertical"
                     :on-finish="onFinish"
                     :on-finish-failed="onFinishFailed">
-                        <a-form-item label="账号" :rules="[{required:true, message:'请输入账号'}]" class="form-item">
+                        <a-form-item label="账号" class="form-item" name="account">
                             <a-input v-model:value="loginForm.account"></a-input>
                         </a-form-item>
-                        <a-form-item label="密码" :rules="[{required: true, message: '请输入密码'}]" aria-autocomplete="off" class="form-item">
+                        <a-form-item label="密码" class="form-item" name="account">
                             <a-input-password v-model:value="loginForm.password"></a-input-password>
                         </a-form-item>
                         <a-form-item class="form-item">
-                            <a-button type="primary" id="submit-button" htmp-type="submit">登录</a-button>
+                            <a-button type="primary" id="submit-button" @click="login">登录</a-button>
                         </a-form-item>
                     </a-form>
                 </a-card>
@@ -27,6 +27,9 @@
 
 <script>
 import {Card, Row, Col, Form, FormItem, Input, InputPassword, Button} from 'ant-design-vue'
+import {message} from 'ant-design-vue'
+import {post} from '../api/request.js'
+import {saveToken} from '../api/token.js'
 export default {
     name: 'LoginPage',
     components: {
@@ -45,8 +48,9 @@ export default {
     data() {
         return {
             loginForm: {
-                account: "",
-                password: ""
+                account: '',
+                password: '',
+                deviceId: 'undefined'
             }
         }
     },
@@ -57,6 +61,25 @@ export default {
         onFinishFailed: function(err) {
             console.log("finish failed")
             console.log(err)
+        },
+        login() {
+            post('/auth/login', this.loginForm)
+            .then(response=>{
+                let resp = response.data
+                if (resp.code == 200) {
+                    saveToken(resp.token)
+                    message.success("登录成功")
+                    this.$router.push({path: '/chat'})
+                }else if (resp.code == 404) {
+                    message.warn("用户不存在")
+                }else if (resp.code == 403) {
+                    message.warn("密码错误")
+                }
+            })
+            .catch(error=>{
+                message.error("request error")
+                console.error(error)
+            })
         }
     },
     setup() {
