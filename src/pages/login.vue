@@ -28,8 +28,9 @@
 <script>
 import {Card, Row, Col, Form, FormItem, Input, InputPassword, Button} from 'ant-design-vue'
 import {message} from 'ant-design-vue'
-import {post} from '../api/request.js'
+import {post, get} from '../api/request.js'
 import {saveToken} from '../api/token.js'
+import { store, getStoredJson } from '@/utils/storage'
 export default {
     name: 'LoginPage',
     components: {
@@ -62,24 +63,31 @@ export default {
             console.log("finish failed")
             console.log(err)
         },
-        login() {
-            post('/auth/login', this.loginForm)
-            .then(response=>{
+        async login() {
+            try {
+                let response = await post('/auth/login', this.loginForm)
                 let resp = response.data
-                if (resp.code == 200) {
-                    saveToken(resp.token)
+                switch(resp.code) {
+                    case 404: message.warn("用户不存在");return;
+                    case 403: message.warn("密码或账号错误");return;
+                    default: break;
+                }
+                saveToken(resp.token)
+
+                let uResponse = await get('/user')
+                let uResp = uResponse.data
+                if (uResp.code != 200) {
+                    console.error(uResp.message)
+                }else {
+                    store("goim_self_user", uResp.userInfo)
+                    console.info(getStoredJson("goim_self_user"))
                     message.success("登录成功")
                     this.$router.push({path: '/chat'})
-                }else if (resp.code == 404) {
-                    message.warn("用户不存在")
-                }else if (resp.code == 403) {
-                    message.warn("密码错误")
                 }
-            })
-            .catch(error=>{
-                message.error("request error")
+            }catch(error) {
                 console.error(error)
-            })
+                message.error("request error")
+            }
         }
     },
     setup() {
