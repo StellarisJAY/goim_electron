@@ -30,7 +30,8 @@ import {Card, Row, Col, Form, FormItem, Input, InputPassword, Button} from 'ant-
 import {message} from 'ant-design-vue'
 import {post, get} from '../api/request.js'
 import {saveToken} from '../api/token.js'
-import { store, getStoredJson } from '@/utils/storage'
+import { store } from '@/utils/storage'
+import {initWebsocketConnection} from '../api/websocket.js'
 export default {
     name: 'LoginPage',
     components: {
@@ -80,7 +81,7 @@ export default {
                     console.error(uResp.message)
                 }else {
                     store("goim_self_user", uResp.userInfo)
-                    console.info(getStoredJson("goim_self_user"))
+                    initWebsocketConnection()
                     message.success("登录成功")
                     this.$router.push({path: '/chat'})
                 }
