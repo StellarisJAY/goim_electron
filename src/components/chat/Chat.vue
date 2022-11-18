@@ -10,8 +10,8 @@
                 </template>
                 <MessageBox :messages="messages" :group-members="groupMembers" :other-user="userInfo" id="message-box"/>
                 <a-divider></a-divider>
-                <a-textarea placeholder="input message..." id="text-area"></a-textarea>
-                <a-button type="primary" id="send-button">发送</a-button>
+                <a-textarea placeholder="input message..." v-model:value="inputMessage" id="text-area"></a-textarea>
+                <a-button type="primary" id="send-button" @click="sendMessage">发送</a-button>
             </a-card>
         </a-col>
         <a-col :span="6">
@@ -28,6 +28,7 @@ import {Card, Col, Row, Textarea, Button, Divider} from 'ant-design-vue'
 import { PhoneOutlined } from '@ant-design/icons-vue';
 import {get} from '../../api/request.js'
 import MessageBox from './MessageBox.vue';
+import {getReceivedMessage} from '../../api/websocket.js'
 export default {
     name: 'ChatCard',
     components: {
@@ -49,18 +50,8 @@ export default {
             groupInfo: null,
             userInfo: null,
             groupMembers: new Map,
-            messages: [
-                {id: 1, content: 'hello world', from: 1001, to: 58241228567105540},
-                {id: 1, content: 'hello world', from: 1001, to: 58241228567105540},
-                {id: 1, content: 'hello world', from: 58241228567105540, to: 1001},
-                {id: 1, content: 'hello world', from: 58241228567105540, to: 1001},
-                {id: 1, content: 'hello world', from: 1001, to: 58241228567105540},
-                {id: 1, content: 'hello world', from: 1001, to: 58241228567105540},
-                {id: 1, content: 'hello world', from: 58241228567105540, to: 1001},
-                {id: 1, content: 'hello world', from: 1001, to: 58241228567105540},
-                {id: 1, content: 'hello world', from: 58241228567105540, to: 1001},
-                {id: 1, content: 'hello world', from: 1001, to: 58241228567105540},
-            ]
+            messages: [],
+            inputMessage: ''
         }
     },
     methods: {
@@ -113,6 +104,11 @@ export default {
                 console.error(error)
                 return null
             }
+        },
+        sendMessage: function() {
+            console.log("input: ", this.inputMessage)
+            this.messages.push({id: 1, from: 1001, to: 58241228567105540, content: this.inputMessage})
+            this.inputMessage = null
         }
     },
     created() {
@@ -132,6 +128,15 @@ export default {
                 that.groupMembers = members
             })
         }
+        setInterval(()=>{
+            let messages = getReceivedMessage(that.target)
+            if (that.messages == null || that.messages == undefined) {
+                that.messages = []
+            }
+            if (messages.length > 0) {
+                that.messages.push(...messages)
+            }
+        }, 500)
     }
 }
 </script>
