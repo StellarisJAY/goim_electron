@@ -24,11 +24,12 @@
 </template>
 
 <script>
-import {Card, Col, Row, Textarea, Button, Divider} from 'ant-design-vue'
+import {Card, Col, Row, Textarea, Button, Divider, message} from 'ant-design-vue'
 import { PhoneOutlined } from '@ant-design/icons-vue';
-import {get} from '../../api/request.js'
+import {get, post} from '../../api/request.js'
 import MessageBox from './MessageBox.vue';
 import {getReceivedMessage} from '../../api/websocket.js'
+import { getStoredJson } from '@/utils/storage';
 export default {
     name: 'ChatCard',
     components: {
@@ -51,7 +52,8 @@ export default {
             userInfo: null,
             groupMembers: new Map,
             messages: [],
-            inputMessage: ''
+            inputMessage: '',
+            selfUser: null,
         }
     },
     methods: {
@@ -106,13 +108,26 @@ export default {
             }
         },
         sendMessage: function() {
-            console.log("input: ", this.inputMessage)
-            this.messages.push({id: 1, from: 1001, to: 58241228567105540, content: this.inputMessage})
-            this.inputMessage = null
+            let that = this
+            post('/chat/send', {to: this.target, content: this.inputMessage, flag: this.isGroup ? 3 : 1})
+            .then(response=>{
+                let resp = response.data
+                if (resp.code == 200) {
+                    that.messages.push({id: resp.messageID, from: that.selfUser.id, to: that.target, content: that.inputMessage, timestamp: resp.timestamp})
+                    that.inputMessage = null
+                }else {
+                    message.warn('发送失败，请重试')
+                }
+            })
+            .catch(error=>{
+                console.debug(error)
+                message.error('发送出错')
+            })
         }
     },
     created() {
         let that = this
+        this.selfUser = getStoredJson('goim_self_user')
         if (!this.isGroup) {
             this.getUserInfo(this.target)
             .then(userInfo=>{
